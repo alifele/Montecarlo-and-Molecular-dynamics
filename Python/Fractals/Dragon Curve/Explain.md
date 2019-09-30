@@ -1,8 +1,8 @@
 my method to draw the dragon fractal is combination of rotation and origin transmition.
 # Rotatoin
-If you look carefully to a dragon curve you can easily see that in each step the previous step must be rotated ** along its first point**
-with magnitude of 45 deg.
-Then the result must be rotated along its last point with magnitude of -90 deg.
+اگر با دقت به فرکتال نگاه کنید متوجه میشوید که به چند تابع میتوان به شکل فراکتال دست یافت.
+برای این منظور ابتدا فرض کنید که پاره خطی داریم. حال این پاره خط را حول نقطه اولش به اندازه -۴۵ درجه دوران میدهیم.
+اگر شکل حاصل را حول آخرین نقطه اش به اندازه -90 درجه دوران دهیم و شکل به وجود آمده را در ادامه ی شکل قبلی بگذاریم در آن صورت مرحله اول فراکتال به وجود می آید.
+حال کافی است که این کار را برای چندین بار انجام دهیم. به طوری که خروجی در هر لوپ ورودی در لوپ بعدی باشد.
 
-Now two sections must be concatinated and then you should repeat the process on the concatinated array
-
+در شکل زیر میتوانید مراحل تولید فراکتال و  همچنین شکل نهایی را مشاهده کنید
