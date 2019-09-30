@@ -1,24 +1,15 @@
+مثلث سرپینسکی
 
-# How to draw koch fractal:
+این فراکتال معروف را میتوان به سادگی به کمک سه تابع تولید کنیم:
 
-Drawing this fractal is the simplest I think.
+توابعی که برای این کار مورد نیاز است عبارت اند از:
+تابع تجاتس
+تابع انتقال.
 
-To make this fractal you will need three functions:
 
-## Step1:
+روش کار به این صورت است که در ابتدا مثلثی رسم میکنیم
+سپس تابع تجانس به مقدار یک دوم را روی این مثلث اثر میدهیم
+در مرحله بعدی مثل کوچک به وجود آمده را به کمک دو بردار انتقال به دو موقعیت جدید جابجا میکنیم.
+این مراحل را در شکل میتوانید ببینید:
 
-After giving your input the first function scales it to 1/3
-
-## Step2:
-
-Then The rotation function should rotate the scaled line 60 deg.
-
-## Step3:
-
-In this step we will need another rotator function to rotate the point generated in the previous step -120 deg.
-
-## Last step:
-
-you just need to rotate the point generated in step3 +60 deg and concatinate the segments.
-
-now if you plot the output you will see a nice koch fractal on your screen
+اگر این کار را چندین بار ادامه دهیم در آخر به مثلث سرپینسکی میرسیم
