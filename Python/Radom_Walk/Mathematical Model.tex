@@ -1,0 +1,91 @@
+\documentclass[12pt,a4paper]{article}
+\begin{document}
+\begin{titlepage}
+\centering
+\scshape\LARGE 
+The Mathematical model of Random Walk
+
+\vspace{1cm}
+	
+	\vspace{1.5cm}
+	
+	\vspace{2cm}
+	\begin{Large}
+	Author:
+	\end{Large} \par
+	{\Large\itshape Ali Fele Paranj \par}
+	\vfill
+	{\large \today\par}
+
+
+\end{titlepage}
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Mathematical Model}
+\subsection{Mean}
+As you saw the cool results emerged from simulation of the Random Walker in 2D, there is somehow 'hidden' regularity among the existing randomnesses.
+
+In this section we are trying to find a suitable mathematical model describing the phenomena. To start building the model, suppose that a dizzy 1D walker is standing at $x=0$ location. The walker has a unfair coin in his hand. at each step he tosses the coin and depending on the outcome of the coin he moves left or right. suppose that the probability of finding the tossed coin as Tails is $p$ and as Heads is $q$. For Tails he moves to right and for Heads he moves to left. So we can write the position of the walker as below:
+\begin{equation}
+X_{n}  = a_{1}l + a_{2}l + a_{3}l + ... + X_{n}l = \sum_{i=1}^{n} a_{i}l = l\sum_{i=1}^{n} a_{i}
+\end{equation}
+in which the $a_{i}$ is the outcome of the tossed coin (-1 or Heads with probability q and +1 or Tails with probability p). with these defenitions it would be worth to look at the average of $X_{n}$. So we can write:
+\begin{equation}
+\langle(X_{n})\rangle = \langle(X_{n-1} + a_{n-1}l)\rangle = \langle(X_{n-1})\rangle + \langle(a_{n-1}l)\rangle
+=\langle(X_{n-1})\rangle + l\langle(a_{n})\rangle
+\end{equation}
+As we can recal from elementary statastical courses we can write:
+\begin{equation}
+\langle f(x)\rangle = \int p(x)f(x)dx 
+\end{equation}
+So now we can calculate the $\langle a\rangle$.
+\begin{equation}
+\langle a_{n} \rangle = -q + p
+\end{equation}
+Now we can rewrite equation 2 :
+\begin{equation}
+\langle(X_{N-1})\rangle + l(p-q) = Nl(p-q)
+\end{equation}
+In the last equation I used recursion procedure to write $\langle(X_{N-1})\rangle$ in terms of $\langle(X_{N-2})\rangle$  and so on.
+
+Congratulations! We could calculate the average location of the random walker:
+\begin{equation}
+\langle X_{N} \rangle = Nl(p-q)
+\end{equation}
+
+
+\subsection{Variance}
+What about variance? What can we say about the length around origin that we can find the walker with more probability. It is the meaning of the Variance $\sigma^{2}$. So we need to calculate the well-known equation of the Variance:
+\begin{equation}
+\sigma^{2} =\langle(X - \langle X \rangle)^{2}\rangle  = \langle X^{2} \rangle - \langle X \rangle^{2}
+\end{equation}
+We already know $\langle X\rangle^2$. So the only thing we need to calculate is $\langle X^2 \rangle$.
+\begin{equation}
+\langle X^2\rangle = \langle\Big(\sum_{i=1}^n X_i\Big)^2\rangle = \langle\sum_{i=1}^n X_i\sum_{j=1}^n X_j\rangle = \sum_{i=1}^n\langle X_i^2\rangle + \sum_{i\neq j}\langle X_iX_j \rangle
+\end{equation}
+Now we can write:
+\begin{equation}
+\sum_{i=1}^n\langle X_i^2\rangle + \sum_{i\neq j}\langle X_iX_j \rangle =  \sum_{i=1}^n\langle X_i^2\rangle + \sum_{i\neq j}\langle X_i\rangle \langle X_j \rangle\ = nl^2 + l^2n(n-1)(p-q)(p-q)
+\end{equation}
+Now by subtracting $\langle X^2 \rangle$ and $\langle X \rangle^2$ we can easily calculate $\sigma ^2$:
+\begin{equation}
+\sigma^2 = nl^2 + l^2n(n-1)(p-q)^2 - n^2l^2(p-q)^2
+\end{equation}
+\begin{equation}
+=nl^2(p-q)^2((n-1)-n)) \\
+=nl^2 - nl^2(p-q)^2 = nl^2(1-(p-q)^2)
+\end{equation}
+since $p+q=1$ so we can write $p-q=2p-1$:
+\begin{equation}
+\sigma^2 = nl^2(1-(2p-1)^2) = nl^2(1-4p^2 -1 +4p) = 4pnl^2(1-p) = 4pqnl^2
+\end{equation}
+now if we suppose that the random walker had $n$ steps in $t$ seconds, each time step as $\tau$ so we can write $n=\frac{t}{\tau}$. By this change of variable we can rewrite the $\sigma^2$ equaion:
+\begin{equation}
+\sigma^2 = \frac{4l^2}{\tau}pqt
+\end{equation}
+\end{document}
