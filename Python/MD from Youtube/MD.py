@@ -24,11 +24,9 @@ def run(**args):
     output=[]
     while step < nsteps:
 
-
-
         forces = computeForces(mass, vels, temp, relax, dt)
         pos, vels = integrate(pos.copy(), vels.copy(), forces, mass, dt)
-        
+        wallHitCheck(pos, vels, box)
 
         step+=1
 
