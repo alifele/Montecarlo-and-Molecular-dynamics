@@ -30,32 +30,47 @@ def init():
     return line,
 
 def Animate():
-    anim = animation.FuncAnimation(fig, animate, init_func = init, frames = 100, interval=30, blit = True)
+    anim = animation.FuncAnimation(fig, animate, init_func = init, frames = 100, interval=100, blit = True)
     plt.show()
 
 def move():
-    data[:,0] += data[:,2]
-    data[:,1] += data[:,3]
+    Forces_n = force(data)
+    data[:,0] = data[:,0] + data[:,2]*dt + 0.5* Forces_n[0]*dt**2
+    data[:,1] = data[:,1] + data[:,3] + 0.5* Forces_n[1]
+    Forces_n1 = [-data[:,0], -data[:,1]]
+    data[:,2] += 0.5*(Forces_n[0] + Forces_n1[0])
+    data[:,3] += 0.5*(Forces_n[1] + Forces_n1[1])*dt
+
 
 def wall_hit():
     data[:,2][ (data[:,0] > box[0][1]) + (data[:,0] < box[0][0]) ] *= -1
     data[:,3][ (data[:,1] > box[1][1]) + (data[:,1] < box[1][0]) ] *= -1
 
-def Force_cal(x1,x2,y1,y2):
+def Force_cal_X(x1,x2,y1,y2):
     U = 2 * (x1-x2) / ((x1-x2)**2 + (y1-y2)**2)**2
     return U
 
+def Force_cal_Y(x1,x2,y1,y2):
+    U = 2 * (y1-y2) / ((x1-x2)**2 + (y1-y2)**2)**2
+    return U
 
 def force(data):
-    force = np.zeros((natom, natom))
+    force_x= np.zeros((natom, natom))
+    force_y= np.zeros((natom, natom))
     for particle in range(natom):
         x1, y1 = data[particle,0], data[particle,1]
         for front_particle in range(particle + 1, natom):
             x2, y2 = data[front_particle,0], data[front_particle,1]
-            force[particle, front_particle] = Force_cal(x1,x2,y1,y2)
-            force[front_particle, particle] = -force[particle, front_particle]
+            force_x[particle, front_particle] = Force_cal_X(x1,x2,y1,y2)
+            force_x[front_particle, particle] = -force_x[particle, front_particle]
+            F_X = np.sum(force_x, axis=1)
+            force_y[particle, front_particle] = Force_cal_Y(x1,x2,y1,y2)
+            force_y[front_particle, particle] = -force_y[particle, front_particle]
+            F_Y = np.sum(force_y, axis=1)
+            Forces  = [F_X, F_Y]
 
-    return force
+
+    return Forces
 
 
 
@@ -86,11 +101,12 @@ def main(**args):
 if __name__ == "__main__":
 
     params  ={
-    "natom":2,
+    "natom":20,
     "ndim":2,
-    "box":[(-10,10),(-10,10)]
+    "box":[(-10,10),(-10,10)],
+    "dt" : 0.001
     }
-    natom, ndim, box = params['natom'], params['ndim'], params['box']
+    natom, ndim, box, dt = params['natom'], params['ndim'], params['box'], params['dt']
     data = initval(params['ndim'],params['box'],params['natom'])
     fig, ax, line = showinit(data, params['box'])
     main(**params)
