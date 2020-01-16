@@ -3,10 +3,11 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
 
-# First set up the figure, the axis, and the plot element we want to animate
-fig = plt.figure()
-ax = plt.axes(xlim=(0, 2), ylim=(-2, 2))
-line, = ax.plot([], [], lw=2)
+def init_():
+    fig = plt.figure()
+    ax = plt.axes(xlim=(0, 2), ylim=(-2, 2))
+    line, = ax.plot([], [], lw=2)
+    return fig, ax, line
 
 # initialization function: plot the background of each frame
 def init():
@@ -21,8 +22,10 @@ def animate(i):
     return line,
 
 # call the animator.  blit=True means only re-draw the parts that have changed.
-anim = animation.FuncAnimation(fig, animate, init_func=init,
-                               frames=200, interval=20, blit=True)
+def Anim():
+    anim = animation.FuncAnimation(fig, animate, init_func=init,
+                                   frames=200, interval=20, blit=True)
+    plt.show()
 
 # save the animation as an mp4.  This requires ffmpeg or mencoder to be
 # installed.  The extra_args ensure that the x264 codec is used, so that
@@ -30,4 +33,14 @@ anim = animation.FuncAnimation(fig, animate, init_func=init,
 # your system: for more information, see
 # http://matplotlib.sourceforge.net/api/animation_api.html
 
-plt.show()
+
+
+
+def main():
+    Anim()
+
+
+
+if __name__ == "__main__":
+    fig, ax, line = init_()
+    main()
