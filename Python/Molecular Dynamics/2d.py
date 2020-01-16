@@ -13,14 +13,14 @@ def initval(ndim,box,natom):
     data = np.ones((natom,int(2*ndim)))
     data[:,0] = box[0][0] + (box[0][1] - box[0][0])* np.random.random(natom)
     data[:,1] = box[1][0] + (box[1][1] - box[1][0])* np.random.random(natom)
-    data[:,2] = np.random.random(natom) * 2 - 1
-    data[:,3] = np.random.random(natom) * 2 - 1
+    data[:,2] = (np.random.random(natom) * 2 - 1)*0.4
+    data[:,3] = (np.random.random(natom) * 2 - 1)*0.4
     return data
 
 def showinit(data,box):
     fig, ax = plt.subplots()
-    ax.set_xlim((box[0][0],box[0][1]))
-    ax.set_ylim((box[1][0],box[1][1]))
+    ax.set_xlim((box[0][0]*1.1,box[0][1]*1.1))
+    ax.set_ylim((box[1][0]*1.1,box[1][1]*1.1))
     line, = ax.plot(data[:,0], data[:,1],'o')
 
     return fig, ax, line
@@ -30,7 +30,7 @@ def init():
     return line,
 
 def Animate():
-    anim = animation.FuncAnimation(fig, animate, init_func = init, frames = 100, interval=100, blit = True)
+    anim = animation.FuncAnimation(fig, animate, init_func = init, frames = 100, interval=40, blit = True)
     plt.show()
 
 def move():
@@ -46,12 +46,18 @@ def wall_hit():
     data[:,2][ (data[:,0] > box[0][1]) + (data[:,0] < box[0][0]) ] *= -1
     data[:,3][ (data[:,1] > box[1][1]) + (data[:,1] < box[1][0]) ] *= -1
 
+def periodic_wall():
+    data[:,0][data[:,0] > box[0][1]] = box[0][0]
+    data[:,0][data[:,0] < box[0][0]] = box[0][1]
+    data[:,1][data[:,1] > box[1][1]] = box[1][0]
+    data[:,1][data[:,1] < box[1][0]] = box[1][1]
+
 def Force_cal_X(x1,x2,y1,y2):
-    U = 2 * (x1-x2) / ((x1-x2)**2 + (y1-y2)**2)**2
+    U = (x1-x2) / ((x1-x2)**2 + (y1-y2)**2)
     return U
 
 def Force_cal_Y(x1,x2,y1,y2):
-    U = 2 * (y1-y2) / ((x1-x2)**2 + (y1-y2)**2)**2
+    U =  (y1-y2) / ((x1-x2)**2 + (y1-y2)**2)
     return U
 
 def force(data):
@@ -80,7 +86,8 @@ def force(data):
 
 def animate(i):
     move()
-    wall_hit()
+    #wall_hit()
+    periodic_wall()
     line.set_data(data[:,0],data[:,1])
     return line,
 
@@ -101,9 +108,9 @@ def main(**args):
 if __name__ == "__main__":
 
     params  ={
-    "natom":20,
+    "natom":50,
     "ndim":2,
-    "box":[(-10,10),(-10,10)],
+    "box":[(-100,100),(-100,100)],
     "dt" : 0.001
     }
     natom, ndim, box, dt = params['natom'], params['ndim'], params['box'], params['dt']
