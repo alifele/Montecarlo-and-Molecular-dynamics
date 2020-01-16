@@ -108,7 +108,7 @@ def main(**args):
 if __name__ == "__main__":
 
     params  ={
-    "natom":50,
+    "natom":20,
     "ndim":2,
     "box":[(-100,100),(-100,100)],
     "dt" : 0.001
