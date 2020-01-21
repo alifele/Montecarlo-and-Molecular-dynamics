@@ -13,8 +13,10 @@ def initval(ndim,box,natom):
     data = np.ones((natom,int(2*ndim)))
     data[:,0] = box[0][0] + (box[0][1] - box[0][0])* np.random.random(natom)
     data[:,1] = box[1][0] + (box[1][1] - box[1][0])* np.random.random(natom)
-    data[:,2] = (np.random.random(natom) * 2 - 1)*0.1
-    data[:,3] = (np.random.random(natom) * 2 - 1)*0.1
+    data[:,2] = (np.random.random(natom) * 2 - 1)*400
+    data[:,3] = (np.random.random(natom) * 2 - 1)*400
+    data[:,2] -= np.mean(data[:,2])
+    data[:,3] -= np.mean(data[:,3])
     return data
 
 def showinit(data,box):
@@ -30,15 +32,15 @@ def init():
     return line,
 
 def Animate():
-    anim = animation.FuncAnimation(fig, animate, init_func = init, frames = 100, interval=40, blit = True)
+    anim = animation.FuncAnimation(fig, animate, init_func = init, frames = 100, interval=1, blit = True)
     plt.show()
 
 def move():
     Forces_n = force(data)
     data[:,0] = data[:,0] + data[:,2]*dt + 0.5* Forces_n[0]*dt**2
-    data[:,1] = data[:,1] + data[:,3] + 0.5* Forces_n[1]
+    data[:,1] = data[:,1] + data[:,3]*dt + 0.5* Forces_n[1]*dt**2
     Forces_n1 = [-data[:,0], -data[:,1]]
-    data[:,2] += 0.5*(Forces_n[0] + Forces_n1[0])
+    data[:,2] += 0.5*(Forces_n[0] + Forces_n1[0])*dt
     data[:,3] += 0.5*(Forces_n[1] + Forces_n1[1])*dt
 
 
@@ -56,14 +58,14 @@ def Force_cal_X(x1,x2,y1,y2):
     r2 = (x1-x2)**2 + (y1-y2)**2
     r6 = r2*r2*r2
     r12 = r6*r6
-    F = 4*(-12/(r12) + 6/(r6))*(x1-x2)/(r2)
+    F = 4*(12*sigma**12/(r12) - 6*sigma**6/(r6))*(x1-x2)/(r2)
     return F
 
 def Force_cal_Y(x1,x2,y1,y2):
     r2 = (x1-x2)**2 + (y1-y2)**2
     r6 = r2*r2*r2
     r12 = r6*r6
-    F = 4*(-12/(r12) + 6/(r6))*(y1-y2)/(r2)
+    F = 4*(12*sigma**12/(r12) - 6*sigma**6/(r6))*(y1-y2)/(r2)
     return F
 
 def force(data):
@@ -113,12 +115,13 @@ def main(**args):
 if __name__ == "__main__":
 
     params  ={
-    "natom":22,
+    "natom":20,
     "ndim":2,
-    "box":[(-15,15),(-15,15)],
-    "dt" : 0.0001
+    "box":[(-20,20),(-20,20)],
+    "dt" : 0.0001,
+    "sigma":3
     }
-    natom, ndim, box, dt = params['natom'], params['ndim'], params['box'], params['dt']
+    natom, ndim, box, dt , sigma = params['natom'], params['ndim'], params['box'], params['dt'], params["sigma"]
     data = initval(params['ndim'],params['box'],params['natom'])
     fig, ax, line = showinit(data, params['box'])
     main(**params)
