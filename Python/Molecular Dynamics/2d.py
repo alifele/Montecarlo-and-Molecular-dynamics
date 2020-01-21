@@ -13,8 +13,8 @@ def initval(ndim,box,natom):
     data = np.ones((natom,int(2*ndim)))
     data[:,0] = box[0][0] + (box[0][1] - box[0][0])* np.random.random(natom)
     data[:,1] = box[1][0] + (box[1][1] - box[1][0])* np.random.random(natom)
-    data[:,2] = (np.random.random(natom) * 2 - 1)*0.4
-    data[:,3] = (np.random.random(natom) * 2 - 1)*0.4
+    data[:,2] = (np.random.random(natom) * 2 - 1)*0.1
+    data[:,3] = (np.random.random(natom) * 2 - 1)*0.1
     return data
 
 def showinit(data,box):
@@ -53,12 +53,18 @@ def periodic_wall():
     data[:,1][data[:,1] < box[1][0]] = box[1][1]
 
 def Force_cal_X(x1,x2,y1,y2):
-    U = (x1-x2) / ((x1-x2)**2 + (y1-y2)**2)
-    return U
+    r2 = (x1-x2)**2 + (y1-y2)**2
+    r6 = r2*r2*r2
+    r12 = r6*r6
+    F = 4*(-12/(r12) + 6/(r6))*(x1-x2)/(r2)
+    return F
 
 def Force_cal_Y(x1,x2,y1,y2):
-    U =  (y1-y2) / ((x1-x2)**2 + (y1-y2)**2)
-    return U
+    r2 = (x1-x2)**2 + (y1-y2)**2
+    r6 = r2*r2*r2
+    r12 = r6*r6
+    F = 4*(-12/(r12) + 6/(r6))*(y1-y2)/(r2)
+    return F
 
 def force(data):
     force_x= np.zeros((natom, natom))
@@ -86,15 +92,14 @@ def force(data):
 
 def animate(i):
     move()
-    #wall_hit()
-    periodic_wall()
+    wall_hit()
+    #periodic_wall()
     line.set_data(data[:,0],data[:,1])
     return line,
 
 
 def main(**args):
     Animate()
-
 
 
 
@@ -108,10 +113,10 @@ def main(**args):
 if __name__ == "__main__":
 
     params  ={
-    "natom":20,
+    "natom":22,
     "ndim":2,
-    "box":[(-100,100),(-100,100)],
-    "dt" : 0.001
+    "box":[(-15,15),(-15,15)],
+    "dt" : 0.0001
     }
     natom, ndim, box, dt = params['natom'], params['ndim'], params['box'], params['dt']
     data = initval(params['ndim'],params['box'],params['natom'])
