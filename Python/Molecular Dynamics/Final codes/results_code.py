@@ -1,19 +1,69 @@
+
+
+#  █████  ██      ██     ███████ ███████ ██      ███████     ██████   █████  ██████   █████  ███    ██      ██
+# ██   ██ ██      ██     ██      ██      ██      ██          ██   ██ ██   ██ ██   ██ ██   ██ ████   ██      ██
+# ███████ ██      ██     █████   █████   ██      █████       ██████  ███████ ██████  ███████ ██ ██  ██      ██
+# ██   ██ ██      ██     ██      ██      ██      ██          ██      ██   ██ ██   ██ ██   ██ ██  ██ ██ ██   ██
+# ██   ██ ███████ ██     ██      ███████ ███████ ███████     ██      ██   ██ ██   ██ ██   ██ ██   ████  █████
+
+#  █████  ███████  ██  ██████   ██████   █████   █████   ██████
+# ██   ██ ██      ███ ██  ████ ██  ████ ██   ██ ██   ██ ██
+#  ██████ ███████  ██ ██ ██ ██ ██ ██ ██  █████   █████  ███████
+#      ██      ██  ██ ████  ██ ████  ██ ██   ██ ██   ██ ██    ██
+#  █████  ███████  ██  ██████   ██████   █████   █████   ██████
+
+#
+# ███    ███  ██████  ██      ███████  ██████ ██    ██ ██       █████  ██████
+# ████  ████ ██    ██ ██      ██      ██      ██    ██ ██      ██   ██ ██   ██
+# ██ ████ ██ ██    ██ ██      █████   ██      ██    ██ ██      ███████ ██████
+# ██  ██  ██ ██    ██ ██      ██      ██      ██    ██ ██      ██   ██ ██   ██
+# ██      ██  ██████  ███████ ███████  ██████  ██████  ███████ ██   ██ ██   ██
+
+# ██████  ██    ██ ███    ██  █████  ███    ███ ██  ██████ ███████
+# ██   ██  ██  ██  ████   ██ ██   ██ ████  ████ ██ ██      ██
+# ██   ██   ████   ██ ██  ██ ███████ ██ ████ ██ ██ ██      ███████
+# ██   ██    ██    ██  ██ ██ ██   ██ ██  ██  ██ ██ ██           ██
+# ██████     ██    ██   ████ ██   ██ ██      ██ ██  ██████ ███████
+
+
+
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation, rc
 from IPython.display import HTML
 
 
-
 def initval(ndim,box,natom):
+
+    sigma = 1
+    n = natom
+    data_ = []
+    x=-10
+    dot_row = 5
+    for row in range(dot_row):
+        x += sigma
+        y=-10
+        for i in range(int(n/dot_row)):
+            y += sigma
+            data_.append([x,y])
+    data_ = np.array(data_)
+
     data = np.ones((natom,int(2*ndim)))
     data[:,0] = box[0][0] + (box[0][1] - box[0][0])* np.random.random(natom)
     data[:,1] = box[1][0] + (box[1][1] - box[1][0])* np.random.random(natom)
-    data[:,2] = (np.random.random(natom) * 2 - 1)*40
-    data[:,3] = (np.random.random(natom) * 2 - 1)*40
+    data[:,2] = (np.random.random(natom) * 2 - 1)*400
+    data[:,3] = (np.random.random(natom) * 2 - 1)* 400
     data[:,2] -= np.mean(data[:,2])
     data[:,3] -= np.mean(data[:,3])
+
+    for i in range(data_.shape[0]):
+        data[i,0] = data_[i,0]
+        data[i,1] = data_[i,1]
+
     return data
+
 
 
 def periodic_wall():
@@ -80,19 +130,71 @@ def file_close(f):
     f.close()
 
 
+def Energy():
+    U = 0
+    K = 0
+    for i in range(natom-1):
+        X1 = data[i,0]
+        Y1 = data[i,1]
+        for j in range(i+1,natom):
+            X2 = data[j,0]
+            Y2 = data[j,1]
+            r2 = (X1-X2)**2 + (Y1-Y2)**2
+            r6 = r2*r2*r2
+            r12 = r6*r6
+            U+=40*(sigma**12/(r12) - sigma**6/(r6))
+    for atom in range(natom):
+        K += 1/2 * (m) * (data[atom,2]**2 + data[atom,3]**2)
+    E = U + K
+    return U,K,E
+
+
+def right_particle_counter():
+    numebr = len(data[data[:,0] > 0])
+    return numebr
+
+def temperature_calculator():
+    T = 0
+    T += (data[:,2]**2 + data[:,3]**2)
+    T /= (2*natom)
+    return T
+
 
 
 
 def main(**args):
-    f = open('results.csv','w+')
-    f.write('X\tY\tV_x\tV_y\n')
-    for i in range(int(T)):
-        f.write('%3.5f\t%3.5f\t%3.5f\t%3.5f\n'%(data[1,0],data[1,1],data[1,2],data[1,3]))
+    #Energy_data = []
+    #number_data = []
+    T_data = []
+    #f = open('results.csv','w+')
+    #f.write('X\tY\tV_x\tV_y\n')
+    for i in range(3*int(T)):
+        #U,K,E = Energy()
+        #number_data.append(right_particle_counter())
+        T_data.append(temperature_calculator())
+        #Energy_data.append([U,K,E])
+        #f.write('%3.5f\t%3.5f\t%3.5f\t%3.5f\n'%(data[1,0],data[1,1],data[1,2],data[1,3]))
         #f.write('hey')
         move()
         wall_hit()
 
-    f.close()
+    #f.close()
+    #Energy_data = np.array(Energy_data)
+    #number_data = np.array(number_data)
+    T_data = np.array(T_data)
+    plt.plot(T_data)
+    plt.plot(T_data, '8', ms= 0.8)
+    #plt.plot(number_data)
+    #plt.plot(number_data, '8', ms = 0.7)
+    plt.title('Inatant T\nwith 50 atoms')
+    #plt.plot(Energy_data[:,0],'o',label='Potential Energy',ms=2)
+    #plt.plot(Energy_data[:,1],'o',label='Kinetik Energy ',ms=2)
+    #plt.plot(Energy_data[:,2],'o',label='Total Energy',ms=2)
+    plt.ylabel('T')
+    plt.xlabel('time($10^{-13}$sec)')
+    plt.legend()
+    plt.show()
+
 
 
 
@@ -107,17 +209,20 @@ def main(**args):
 # ██      ██ ██   ██ ██ ██   ████
 '''
 if __name__ == "__main__":
+    sigma = 1
     params  ={
-    "natom":2,
+    "natom":50,
     "ndim":2,
-    "box":[(-5,5),(-5,5)],
+    "box":[(-15*sigma,15*sigma),(-15*sigma,15*sigma)],
     "dt" : 0.0001,
     "sigma":1,
+    "m" :1
     }
 
-    natom, ndim, box, dt , sigma = params['natom'], params['ndim'], params['box'], params['dt'], params["sigma"]
+    natom, ndim, box, dt , sigma,m = params['natom'], params['ndim'], params['box'], params['dt'], params["sigma"], params['m']
     T = 1000
     data = initval(params['ndim'],params['box'],params['natom'])
+
 
 
 

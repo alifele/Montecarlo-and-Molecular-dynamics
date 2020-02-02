@@ -1,3 +1,28 @@
+
+
+#  █████  ██      ██     ███████ ███████ ██      ███████     ██████   █████  ██████   █████  ███    ██      ██
+# ██   ██ ██      ██     ██      ██      ██      ██          ██   ██ ██   ██ ██   ██ ██   ██ ████   ██      ██
+# ███████ ██      ██     █████   █████   ██      █████       ██████  ███████ ██████  ███████ ██ ██  ██      ██
+# ██   ██ ██      ██     ██      ██      ██      ██          ██      ██   ██ ██   ██ ██   ██ ██  ██ ██ ██   ██
+# ██   ██ ███████ ██     ██      ███████ ███████ ███████     ██      ██   ██ ██   ██ ██   ██ ██   ████  █████
+
+#  █████  ███████  ██  ██████   ██████   █████   █████   ██████
+# ██   ██ ██      ███ ██  ████ ██  ████ ██   ██ ██   ██ ██
+#  ██████ ███████  ██ ██ ██ ██ ██ ██ ██  █████   █████  ███████
+#      ██      ██  ██ ████  ██ ████  ██ ██   ██ ██   ██ ██    ██
+#  █████  ███████  ██  ██████   ██████   █████   █████   ██████
+
+# ███    ███  ██████  ██      ███████  ██████ ██    ██ ██       █████  ██████      ██████  ██    ██ ███    ██  █████  ███    ███ ██  ██████ ███████
+# ████  ████ ██    ██ ██      ██      ██      ██    ██ ██      ██   ██ ██   ██     ██   ██  ██  ██  ████   ██ ██   ██ ████  ████ ██ ██      ██
+# ██ ████ ██ ██    ██ ██      █████   ██      ██    ██ ██      ███████ ██████      ██   ██   ████   ██ ██  ██ ███████ ██ ████ ██ ██ ██      ███████
+# ██  ██  ██ ██    ██ ██      ██      ██      ██    ██ ██      ██   ██ ██   ██     ██   ██    ██    ██  ██ ██ ██   ██ ██  ██  ██ ██ ██           ██
+# ██      ██  ██████  ███████ ███████  ██████  ██████  ███████ ██   ██ ██   ██     ██████     ██    ██   ████ ██   ██ ██      ██ ██  ██████ ███████
+
+
+
+
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation, rc
@@ -10,14 +35,35 @@ from IPython.display import HTML
 # ██       ██████  ██   ████  ██████    ██    ██  ██████  ██   ████ ███████
 
 def initval(ndim,box,natom):
+
+    sigma = 1
+    n = natom
+    data_ = []
+    x=-10
+    dot_row = 5
+    for row in range(dot_row):
+        x += sigma
+        y=-10
+        for i in range(int(n/dot_row)):
+            y += sigma
+            data_.append([x,y])
+    data_ = np.array(data_)
+
     data = np.ones((natom,int(2*ndim)))
     data[:,0] = box[0][0] + (box[0][1] - box[0][0])* np.random.random(natom)
     data[:,1] = box[1][0] + (box[1][1] - box[1][0])* np.random.random(natom)
     data[:,2] = (np.random.random(natom) * 2 - 1)*400
-    data[:,3] = (np.random.random(natom) * 2 - 1)*400
+    data[:,3] = (np.random.random(natom) * 2 - 1)* 400
     data[:,2] -= np.mean(data[:,2])
     data[:,3] -= np.mean(data[:,3])
+
+    for i in range(data_.shape[0]):
+        data[i,0] = data_[i,0]
+        data[i,1] = data_[i,1]
+
     return data
+
+
 
 def showinit(data,box):
     fig, ax = plt.subplots()
@@ -32,8 +78,9 @@ def init():
     return line,
 
 def Animate():
-    anim = animation.FuncAnimation(fig, animate, init_func = init, frames = 100, interval=1, blit = True)
+    anim = animation.FuncAnimation(fig, animate, init_func = init, frames = 500, interval=1, blit = True)
     plt.show()
+    #anim.save('lines.mp4', writer=writer)
 
 def move():
     Forces_n = force(data)
@@ -106,6 +153,7 @@ def main(**args):
 
 
 
+
 '''
 # ███    ███  █████  ██ ███    ██
 # ████  ████ ██   ██ ██ ████   ██
@@ -114,11 +162,14 @@ def main(**args):
 # ██      ██ ██   ██ ██ ██   ████
 '''
 if __name__ == "__main__":
+    Writer = animation.writers['ffmpeg']
+    writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
+
     sigma = 1
     params  ={
-    "natom":40,
+    "natom":120,
     "ndim":2,
-    "box":[(-10*sigma,10*sigma),(-10*sigma,10*sigma)],
+    "box":[(-15*sigma,15*sigma),(-15*sigma,15*sigma)],
     "dt" : 0.0001,
     "sigma":1
     }
