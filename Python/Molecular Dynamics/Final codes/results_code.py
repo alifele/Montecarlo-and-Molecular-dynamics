@@ -2,51 +2,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation, rc
 from IPython.display import HTML
-#
-# ███████ ██    ██ ███    ██  ██████ ████████ ██  ██████  ███    ██ ███████
-# ██      ██    ██ ████   ██ ██         ██    ██ ██    ██ ████   ██ ██
-# █████   ██    ██ ██ ██  ██ ██         ██    ██ ██    ██ ██ ██  ██ ███████
-# ██      ██    ██ ██  ██ ██ ██         ██    ██ ██    ██ ██  ██ ██      ██
-# ██       ██████  ██   ████  ██████    ██    ██  ██████  ██   ████ ███████
+
+
 
 def initval(ndim,box,natom):
     data = np.ones((natom,int(2*ndim)))
     data[:,0] = box[0][0] + (box[0][1] - box[0][0])* np.random.random(natom)
     data[:,1] = box[1][0] + (box[1][1] - box[1][0])* np.random.random(natom)
-    data[:,2] = (np.random.random(natom) * 2 - 1)*400
-    data[:,3] = (np.random.random(natom) * 2 - 1)*400
+    data[:,2] = (np.random.random(natom) * 2 - 1)*40
+    data[:,3] = (np.random.random(natom) * 2 - 1)*40
     data[:,2] -= np.mean(data[:,2])
     data[:,3] -= np.mean(data[:,3])
     return data
 
-def showinit(data,box):
-    fig, ax = plt.subplots()
-    ax.set_xlim((box[0][0]*1.1,box[0][1]*1.1))
-    ax.set_ylim((box[1][0]*1.1,box[1][1]*1.1))
-    line, = ax.plot(data[:,0], data[:,1],'o')
-
-    return fig, ax, line
-
-def init():
-    line.set_data(data[:,0],data[:,1])
-    return line,
-
-def Animate():
-    anim = animation.FuncAnimation(fig, animate, init_func = init, frames = 100, interval=1, blit = True)
-    plt.show()
-
-def move():
-    Forces_n = force(data)
-    data[:,0] = data[:,0] + data[:,2]*dt + 0.5* Forces_n[0]*dt**2
-    data[:,1] = data[:,1] + data[:,3]*dt + 0.5* Forces_n[1]*dt**2
-    Forces_n1 = [-data[:,0], -data[:,1]]
-    data[:,2] += 0.5*(Forces_n[0] + Forces_n1[0])*dt
-    data[:,3] += 0.5*(Forces_n[1] + Forces_n1[1])*dt
-
-
-def wall_hit():
-    data[:,2][ (data[:,0] > box[0][1]) + (data[:,0] < box[0][0]) ] *= -1
-    data[:,3][ (data[:,1] > box[1][1]) + (data[:,1] < box[1][0]) ] *= -1
 
 def periodic_wall():
     data[:,0][data[:,0] > box[0][1]] = box[0][0]
@@ -86,22 +54,47 @@ def force(data):
 
     return Forces
 
+def wall_hit():
+    data[:,2][ (data[:,0] > box[0][1]) + (data[:,0] < box[0][0]) ] *= -1
+    data[:,3][ (data[:,1] > box[1][1]) + (data[:,1] < box[1][0]) ] *= -1
+
+
+def move():
+    Forces_n = force(data)
+    data[:,0] = data[:,0] + data[:,2]*dt + 0.5* Forces_n[0]*dt**2
+    data[:,1] = data[:,1] + data[:,3]*dt + 0.5* Forces_n[1]*dt**2
+    Forces_n1 = [-data[:,0], -data[:,1]]
+    data[:,2] += 0.5*(Forces_n[0] + Forces_n1[0])*dt
+    data[:,3] += 0.5*(Forces_n[1] + Forces_n1[1])*dt
+
+def file_init():
+    f = open('results.csv','+w')
+    f.write('X\tY\tV_x\tV_y\n')
+    return f
+
+def file_write(data,f):
+    f.write('%3.5f\t%3.5f\t%3.5f\t%3.5f\n'%(data[0],data[1],data[2],data[3]))
+    return f
+
+def file_close(f):
+    f.close()
 
 
 
-
-
-
-def animate(i):
-    move()
-    wall_hit()
-    #periodic_wall()
-    line.set_data(data[:,0],data[:,1])
-    return line,
 
 
 def main(**args):
-    Animate()
+    f = open('results.csv','w+')
+    f.write('X\tY\tV_x\tV_y\n')
+    for i in range(int(T)):
+        f.write('%3.5f\t%3.5f\t%3.5f\t%3.5f\n'%(data[1,0],data[1,1],data[1,2],data[1,3]))
+        #f.write('hey')
+        move()
+        wall_hit()
+
+    f.close()
+
+
 
 
 
@@ -114,16 +107,18 @@ def main(**args):
 # ██      ██ ██   ██ ██ ██   ████
 '''
 if __name__ == "__main__":
-    sigma = 1
     params  ={
-    "natom":40,
+    "natom":2,
     "ndim":2,
-    "box":[(-10*sigma,10*sigma),(-10*sigma,10*sigma)],
+    "box":[(-5,5),(-5,5)],
     "dt" : 0.0001,
-    "sigma":1
+    "sigma":1,
     }
-    natom, ndim, box, dt , sigma = params['natom'], params['ndim'], params['box'], params['dt'], params["sigma"]
 
+    natom, ndim, box, dt , sigma = params['natom'], params['ndim'], params['box'], params['dt'], params["sigma"]
+    T = 1000
     data = initval(params['ndim'],params['box'],params['natom'])
-    fig, ax, line = showinit(data, params['box'])
+
+
+
     main(**params)
