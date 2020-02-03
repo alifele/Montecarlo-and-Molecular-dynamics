@@ -12,7 +12,7 @@
 #      ██      ██  ██ ████  ██ ████  ██ ██   ██ ██   ██ ██    ██
 #  █████  ███████  ██  ██████   ██████   █████   █████   ██████
 
-#
+
 # ███    ███  ██████  ██      ███████  ██████ ██    ██ ██       █████  ██████
 # ████  ████ ██    ██ ██      ██      ██      ██    ██ ██      ██   ██ ██   ██
 # ██ ████ ██ ██    ██ ██      █████   ██      ██    ██ ██      ███████ ██████
@@ -104,6 +104,13 @@ def force(data):
 
     return Forces
 
+def Pressure_calculator():
+    Forces = force(data)
+    #Forces = np.array(Forces)
+    P = np.array(Forces[0]) * data[:,0] + np.array(Forces[1]) * data[:,1]
+    P = np.sum(P)/100
+    return P
+
 def wall_hit():
     data[:,2][ (data[:,0] > box[0][1]) + (data[:,0] < box[0][0]) ] *= -1
     data[:,3][ (data[:,1] > box[1][1]) + (data[:,1] < box[1][0]) ] *= -1
@@ -155,43 +162,78 @@ def right_particle_counter():
 
 def temperature_calculator():
     T = 0
-    T += (data[:,2]**2 + data[:,3]**2)
-    T /= (2*natom)
+    T += np.sum(data[:,2]**2 + data[:,3]**2)
+    T /= (2000*natom)
     return T
+
+def vel_outocorellation(data_list):
+    first = 0
+    i=3
+    second = 0
+    third = 0
+    vel1 = []
+    vel2 = []
+    corr = []
+    for tau in range(1,int(T/2)):
+        N = 0
+        for t in range(int(T)-tau):
+            N+=1
+            first+=np.mean(data_list[t][:,i]*data_list[t+tau][:,i])
+            second+=np.mean(data_list[t][:,i])
+            third+=np.mean(data_list[t+tau][:,i])
+            vel1.append(data_list[t][:,i])
+            vel2.append(data_list[t+tau][:,i])
+        first /= N
+        second /= N
+        third /= N
+        result = (first - second*third)/(np.std(vel1)*np.std(vel2))
+        corr.append((tau,-result+2))
+
+    return corr
 
 
 
 
 def main(**args):
+    data_list = []
     #Energy_data = []
     #number_data = []
-    T_data = []
+    #T_data = []
+    #P_data  = []
     #f = open('results.csv','w+')
     #f.write('X\tY\tV_x\tV_y\n')
-    for i in range(3*int(T)):
+    for i in range(int(T)):
+        data_list.append(data)
         #U,K,E = Energy()
         #number_data.append(right_particle_counter())
-        T_data.append(temperature_calculator())
+        #T_data.append(temperature_calculator())
+        #P_data.append(Pressure_calculator())
         #Energy_data.append([U,K,E])
         #f.write('%3.5f\t%3.5f\t%3.5f\t%3.5f\n'%(data[1,0],data[1,1],data[1,2],data[1,3]))
         #f.write('hey')
         move()
         wall_hit()
 
+    corr = vel_outocorellation(data_list)
+    corr = np.array(corr)
+    plt.plot(corr[:,0],corr[:,1])
     #f.close()
     #Energy_data = np.array(Energy_data)
     #number_data = np.array(number_data)
-    T_data = np.array(T_data)
-    plt.plot(T_data)
-    plt.plot(T_data, '8', ms= 0.8)
+    #T_data = np.array(T_data)
+    #plt.plot(T_data)
+    #plt.plot(T_data, '8', ms= 0.8)
+    #plt.plot(P_data)
+    #plt.plot(P_data, '8', ms= 0.8)
     #plt.plot(number_data)
     #plt.plot(number_data, '8', ms = 0.7)
-    plt.title('Inatant T\nwith 50 atoms')
+    plt.title('Velocity outocorrelation of Vy\nwith 50 atoms')
     #plt.plot(Energy_data[:,0],'o',label='Potential Energy',ms=2)
     #plt.plot(Energy_data[:,1],'o',label='Kinetik Energy ',ms=2)
     #plt.plot(Energy_data[:,2],'o',label='Total Energy',ms=2)
-    plt.ylabel('T')
-    plt.xlabel('time($10^{-13}$sec)')
+    plt.ylabel('corr')
+    plt.xlabel('tau')
+    #plt.ylim(0,100000)
     plt.legend()
     plt.show()
 
@@ -211,7 +253,7 @@ def main(**args):
 if __name__ == "__main__":
     sigma = 1
     params  ={
-    "natom":50,
+    "natom":70,
     "ndim":2,
     "box":[(-15*sigma,15*sigma),(-15*sigma,15*sigma)],
     "dt" : 0.0001,
@@ -220,7 +262,7 @@ if __name__ == "__main__":
     }
 
     natom, ndim, box, dt , sigma,m = params['natom'], params['ndim'], params['box'], params['dt'], params["sigma"], params['m']
-    T = 1000
+    T = 200
     data = initval(params['ndim'],params['box'],params['natom'])
 
 

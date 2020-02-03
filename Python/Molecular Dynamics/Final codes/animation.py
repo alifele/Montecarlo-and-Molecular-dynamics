@@ -79,8 +79,8 @@ def init():
 
 def Animate():
     anim = animation.FuncAnimation(fig, animate, init_func = init, frames = 500, interval=1, blit = True)
-    plt.show()
-    #anim.save('lines.mp4', writer=writer)
+    #plt.show()
+    anim.save('low_temp.mp4', writer=writer)
 
 def move():
     Forces_n = force(data)
@@ -88,7 +88,9 @@ def move():
     data[:,1] = data[:,1] + data[:,3]*dt + 0.5* Forces_n[1]*dt**2
     Forces_n1 = [-data[:,0], -data[:,1]]
     data[:,2] += 0.5*(Forces_n[0] + Forces_n1[0])*dt
+    data[:,2] *= 0.95
     data[:,3] += 0.5*(Forces_n[1] + Forces_n1[1])*dt
+    data[:,3] *= 0.95
 
 
 def wall_hit():
@@ -167,7 +169,7 @@ if __name__ == "__main__":
 
     sigma = 1
     params  ={
-    "natom":120,
+    "natom":40,
     "ndim":2,
     "box":[(-15*sigma,15*sigma),(-15*sigma,15*sigma)],
     "dt" : 0.0001,
