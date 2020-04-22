@@ -6,17 +6,19 @@ from matplotlib import animation, rc
 
 class Animatiocls():
 
-    def __init__(self,Lines_list, fig):
-        L = len(Lines_list)
+    def __init__(self,Lines_list,Lines_path, fig):
+        self.L = len(Lines_list)
+        self.LP = len(Lines_path)
 
-        self.Lines_list = [1] * L
+        self.Lines_list = [1] * self.L
+        self.Lines_path = [1] * self.LP
 
-        for i in range(L):
+        for i in range(self.L):
             self.Lines_list[i] = Lines_list[i]
 
-        #self.line1 = line1
-        #self.line2 = line2
-        #self.line3 = line3
+        for i in range(self.LP):
+            self.Lines_path[i] = Lines_path[i]
+
         self.fig = fig
 
 
@@ -29,15 +31,16 @@ class Animatiocls():
 
 
     def animate(self, i):
-        print(t[i])
+        for ii in range(self.L):
+            self.Lines_list[ii].set_data(self.Lines_path[ii][0][i],self.Lines_path[ii][1][i])
 
-        self.Lines_list[0].set_data(t[i], x[i])
-        self.Lines_list[1].set_data(t[-i],x[-i])
-        self.Lines_list[2].set_data([0], x[i])
+        #self.Lines_list[1].set_data(t[i],x[i])
+        #self.Lines_list[1].set_data(t[-i],x[-i])
+        #self.Lines_list[2].set_data([0], x[i])
         return self.Lines_list
 
     def start_animation(self):
-        anim = animation.FuncAnimation(self.fig, self.animate, init_func = self.init,frames=100, interval=10, blit=True, repeat= False)
+        anim = animation.FuncAnimation(self.fig, self.animate, init_func = self.init,frames=1000, interval=10, blit=True, repeat= True)
         plt.show()
 
 
@@ -64,6 +67,6 @@ ax2.plot([],[])
 ax2.get_shared_y_axes().join(ax, ax2)
 ax2.set_yticklabels([])
 line3, = ax2.plot([],[],'r*')
-
-animobj = Animatiocls([line,line2,line3], fig)
+pathes = [[t,x],[t[::-1],x[::-1]],[[0]*len(t),x]]
+animobj = Animatiocls([line,line2,line3], pathes ,fig)
 animobj.start_animation()
